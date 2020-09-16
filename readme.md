@@ -1,6 +1,6 @@
 # Simple Scopes Service
 
-A simple, opinionated service for user service
+A simple, opinionated user service
 to complement https://github.com/geordee/authx
 
 ## Test

@@ -6,7 +6,7 @@ to complement https://github.com/geordee/authx
 ## Test
 
 ```bash
-source .env.local
+source env.local
 go run .
 curl localhost:9095/users/geordee
 ```

@@ -12,5 +12,5 @@ func main() {
 	config.InitializeDB()
 	http.HandleFunc("/users/", api.Users)
 	http.HandleFunc("/", api.Index)
-	log.Fatal(http.ListenAndServe("localhost:9095", nil))
+	log.Fatal(http.ListenAndServe(":9095", nil))
 }

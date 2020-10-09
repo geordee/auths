@@ -2,6 +2,7 @@ package api
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"log"
 	"net/http"
@@ -36,8 +37,8 @@ func mapUser(records []userRecord) model.User {
 func queryUsersByID(userName string) ([]userRecord, error) {
 	var userRecords []userRecord
 	rows, err := config.DB.Query(`
-		select o.name as org
-			, u.name as user
+		select u.name as user
+			, o.name as org
 			, r.name as role
 			, s.name as scope
 		from users_roles x
@@ -47,28 +48,39 @@ func queryUsersByID(userName string) ([]userRecord, error) {
 			inner join scopes s on s.role_id = r.id
 		where u.name = $1`, userName)
 	if err != nil {
-		log.Println("error")
-		log.Println(err)
+		log.Println("Database Error")
+		log.Println(err.Error())
 		return nil, err
 	}
 	defer rows.Close()
+
+	err = rows.Err()
+	if err != nil {
+		log.Println("Query Error")
+		log.Println(err.Error())
+		return nil, err
+	}
+
 	for rows.Next() {
 		user := userRecord{}
 		err = rows.Scan(
-			&user.Org,
 			&user.User,
+			&user.Org,
 			&user.Role,
 			&user.Scope,
 		)
 		if err != nil {
+			log.Println("Row Scan Error")
+			log.Println(err.Error())
 			return nil, err
 		}
 		userRecords = append(userRecords, user)
 	}
-	err = rows.Err()
-	if err != nil {
-		return nil, err
+
+	if len(userRecords) == 0 {
+		return userRecords, errors.New("record_not_found")
 	}
+
 	return userRecords, nil
 }
 
